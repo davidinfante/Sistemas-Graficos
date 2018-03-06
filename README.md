@@ -9,8 +9,8 @@
 - Abrir la consola de comandos y acceder al directorio en el que se encuentra la práctica.
 - Tener instalada la versión de python 3.5 o superior.
 - Ejecutar el comando `python -m http.server 8000` en la cmd.
-- Abrir un navegador y acceder a [localhost:8000/](localhost:8000/). (Se recomienda usar Firefox aunque funciona también en Chrome y Edge).
-- Dentro de [localhost:8000/](localhost:8000/) navegar hasta la carpeta "grua".
+- Abrir un navegador y acceder a [localhost:8000/](http://localhost:8000/). (Se recomienda usar Firefox aunque funciona también en Chrome y Edge).
+- Dentro de [localhost:8000/](http://localhost:8000/) navegar hasta la carpeta "grua".
 
 
 Si se realizan cambios en la práctica, se puede acceder a la nueva versión de la misma recargando la página del navegador.  
