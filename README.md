@@ -16,7 +16,7 @@
 Si se realizan cambios en la práctica, se puede acceder a la nueva versión de la misma recargando la página del navegador.  
 Para usar la práctica desde otro sistema operativo, buscar la manera de crear un servidor web en el propio ordenador al que poder conectarse.
 
-# Práctica 1 - Grúa
+# P1 - Práctica 1 - Grúa
 ## Explicación de los cambios realizados
 
 (Los comentarios de código en esta lista son palabras clave para buscar en el código de la práctica y acceder rápidamente a esa sección)
