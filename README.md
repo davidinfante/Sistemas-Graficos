@@ -16,7 +16,7 @@
 Si se realizan cambios en la práctica, se puede acceder a la nueva versión de la misma recargando la página del navegador.  
 Para usar la práctica desde otro sistema operativo, buscar la manera de crear un servidor web en el propio ordenador al que poder conectarse.
 
-
+# Práctica 1
 ## Explicación de los cambios realizados
 
 Los cambios realizados sobre la práctica base son:  
