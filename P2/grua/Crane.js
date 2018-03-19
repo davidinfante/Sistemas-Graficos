@@ -43,7 +43,10 @@ class Crane extends THREE.Object3D {
     this.trolleyHeight  = this.craneHeight/20;
     
     // Objects for operating with the crane
-    this.base         = null;
+    this.footL        = null;
+    this.legL         = null;
+    this.footR        = null;
+
     this.jib          = null;
     this.trolley      = null;
     this.string       = null;
@@ -59,11 +62,13 @@ class Crane extends THREE.Object3D {
     this.heightMin    = 0;
     this.heightMax    = 0.9*this.craneHeight;
     
-    this.base = this.createBase();
+    this.footL = this.createFootL();
+    this.footR = this.createFootR();
     // A way of feedback, a red jail will be visible around the crane when a box is taken by it
-    this.feedBack = new THREE.BoxHelper (this.base, 0xFF0000);
+    this.feedBack = new THREE.BoxHelper (this.footL, 0xFF0000);
     this.feedBack.visible = false;
-    this.add (this.base);
+    this.add (this.footL);
+    this.add (this.footR);
     this.add (this.feedBack);
   }
   
@@ -76,25 +81,42 @@ class Crane extends THREE.Object3D {
     return this.craneHeight - this.trolleyHeight - this.height;
   }
   
-  /// It creates the base and adds the mast to the base
-  createBase () {
-    var base = new THREE.Mesh (
-      
-      //-----------------
-      //Box base
-      //-----------------
-      new THREE.BoxGeometry (this.craneWidth/10, this.baseHookHeight, this.craneWidth/10, 16, 1),
-                               this.material);
-      /*new THREE.CylinderGeometry (this.craneWidth/10, this.craneWidth/10, this.baseHookHeight, 16, 1), 
-                               this.material);*/
+  /// It creates the left foot of the robot
+  createFootL () {
+    var footL = new THREE.Mesh (
+      new THREE.ConeGeometry (2, 3.5, 30, 16, 1), this.material);
 
-    base.geometry.applyMatrix (new THREE.Matrix4().makeTranslation (0, this.baseHookHeight/2, 0));
-    base.castShadow = true;
-    base.autoUpdateMatrix = false;
-    base.add(this.createMast());
-    return base;
+    footL.geometry.applyMatrix (new THREE.Matrix4().makeTranslation (5, 1.6, 0));
+    footL.castShadow = true;
+    footL.autoUpdateMatrix = false;
+    footL.add(this.createLegL());
+    return footL;
+  }
+
+  /// It creates the left leg of the robot
+  createLegL () {
+    var legL = new THREE.Mesh (
+      new THREE.CylinderGeometry (2, 2, 10, 30, 1), this.material);
+
+    legL.geometry.applyMatrix (new THREE.Matrix4().makeTranslation (5, 3.5*2, 0));
+    legL.castShadow = true;
+    legL.autoUpdateMatrix = false;
+    legL.add(this.legL);
+    return legL;
   }
   
+  /// It creates the right foot of the robot
+  createFootR () {
+    var footR = new THREE.Mesh (
+      new THREE.ConeGeometry (2, 3.5, 30, 16, 1), this.material);
+
+    footR.geometry.applyMatrix (new THREE.Matrix4().makeTranslation (-5, 1.6, 0));
+    footR.castShadow = true;
+    footR.autoUpdateMatrix = false;
+    footR.add(this.createMast());
+    return footR;
+  }
+
   /// It creates the mast and adds the jib to the mast
   createMast () {
     var mast = new THREE.Mesh (

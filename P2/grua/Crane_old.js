@@ -43,7 +43,7 @@ class Crane extends THREE.Object3D {
     this.trolleyHeight  = this.craneHeight/20;
     
     // Objects for operating with the crane
-    this.footL         = null;
+    this.base         = null;
     this.jib          = null;
     this.trolley      = null;
     this.string       = null;
@@ -59,7 +59,7 @@ class Crane extends THREE.Object3D {
     this.heightMin    = 0;
     this.heightMax    = 0.9*this.craneHeight;
     
-    this.footL = this.createfootL();
+    this.base = this.createBase();
     // A way of feedback, a red jail will be visible around the crane when a box is taken by it
     this.feedBack = new THREE.BoxHelper (this.base, 0xFF0000);
     this.feedBack.visible = false;
@@ -76,12 +76,17 @@ class Crane extends THREE.Object3D {
     return this.craneHeight - this.trolleyHeight - this.height;
   }
   
-  /// It creates que left foot of the robot
-  createfootL () {
-    var footL = new THREE.Mesh (
-
-    new THREE.ConeGeometry (this.craneWidth/10, this.baseHookHeight, this.craneWidth/10, 16, 1),
+  /// It creates the base and adds the mast to the base
+  createBase () {
+    var base = new THREE.Mesh (
+      
+      //-----------------
+      //Box base
+      //-----------------
+      new THREE.BoxGeometry (this.craneWidth/10, this.baseHookHeight, this.craneWidth/10, 16, 1),
                                this.material);
+      /*new THREE.CylinderGeometry (this.craneWidth/10, this.craneWidth/10, this.baseHookHeight, 16, 1), 
+                               this.material);*/
 
     base.geometry.applyMatrix (new THREE.Matrix4().makeTranslation (0, this.baseHookHeight/2, 0));
     base.castShadow = true;
