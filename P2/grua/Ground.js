@@ -204,9 +204,9 @@ class Ground extends THREE.Object3D {
     }
   }
   
-  /// The crane can take a box
+  /// The robot can take a box
   /**
-   * @param position The position where the crane's hook is
+   * @param position The position where the robot's hook is
    * @return The box to be taken, or null
    */
   takeBox (position) {
@@ -223,15 +223,15 @@ class Ground extends THREE.Object3D {
       }
     }
     if (minDistance < this.boxSize*this.boxSize) {
-      var boxCrane = this.boxes.children[nearestBox];
-      this.boxes.remove (boxCrane);
+      var boxRobot = this.boxes.children[nearestBox];
+      this.boxes.remove (boxRobot);
       this.updateHeightBoxes(nearestBox);
-      return boxCrane;
+      return boxRobot;
     }
     return null;
   }
   
-  /// The crane has dropped a box
+  /// The robot has dropped a box
   /**
    * @param aBox - The dropped box
    */

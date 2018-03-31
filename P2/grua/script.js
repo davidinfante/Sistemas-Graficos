@@ -38,9 +38,9 @@ function createGUI (withStats) {
     this.height   = 10;
 
     //-----------------
-    //Crane Init Position
+    //Robot Init Position
     //-----------------
-    this.craneinitpos = function () {
+    this.robotinitpos = function () {
       setMessage ("Posición inicial establecida");
       this.rotation = 6;
       this.distance = 10;
@@ -106,16 +106,16 @@ function createGUI (withStats) {
         }
     });
   
-  var craneControls = gui.addFolder ('Crane Controls');
-    craneControls.add (GUIcontrols, 'rotation', 0, 12, 0.001).name('Rotation :');
-    craneControls.add (GUIcontrols, 'distance', 0, 50, 0.1).name('Distance :');
-    craneControls.add (GUIcontrols, 'height', 0, 50, 0.1).name('Height :').listen();
+  var robotControls = gui.addFolder ('Robot Controls');
+    robotControls.add (GUIcontrols, 'rotation', 0, 12, 0.001).name('Rotation :');
+    robotControls.add (GUIcontrols, 'distance', 0, 50, 0.1).name('Distance :');
+    robotControls.add (GUIcontrols, 'height', 0, 50, 0.1).name('Height :').listen();
     // The method  listen()  allows the height attribute to be written, not only read
 
     //-----------------
-    //Crane Init Position
+    //Robot Init Position
     //-----------------
-    craneControls.add(GUIcontrols, 'craneinitpos').name('Crane initial position :');
+    robotControls.add(GUIcontrols, 'robotinitpos').name('Robot initial position :');
   
   if (withStats)
     stats = initStats();

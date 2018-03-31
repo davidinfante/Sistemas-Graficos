@@ -20,7 +20,7 @@ class TheScene extends THREE.Scene {
 
     this.camera = null;
     this.trackballControls = null;
-    this.crane = null;
+    this.robot = null;
     this.ground = null;
   
     this.createLights ();
@@ -78,7 +78,7 @@ class TheScene extends THREE.Scene {
     this.add (this.spotLight2);
   }
   
-  /// It creates the geometric model: crane and ground
+  /// It creates the geometric model: robot and ground
   /**
    * @return The model
    */
@@ -90,72 +90,16 @@ class TheScene extends THREE.Scene {
     //-----------------
     //Texture
     //-----------------
-    this.crane = new Crane(new THREE.MeshPhongMaterial ({map: textura}));
-    model.add (this.crane);
+    this.robot = new Robot();
+    model.add (this.robot);
     
-    this.ground = new Ground (300, 300, new THREE.MeshPhongMaterial ({map: textura}), 4);
+    this.ground = new Ground ();
     model.add (this.ground);
     return model;
   }
-  
-  // Public methods
 
-  /// It adds a new box, or finish the action
-  /**
-
-   * @param event - Mouse information
-   * @param action - Which action is requested to be processed: start adding or finish.
-   */
-  addBox (event, action) {
-    this.ground.addBox(event, action);
-  }
-
-  //-----------------
-  //Deleting Boxes
-  //-----------------
-  /// It deletes a box, or finish the action
-  /**
-
-   * @param event - Mouse information
-   * @param action - Which action is requested to be processed: start deleting or finish.
-   */
-  deleteBox (event, action) {
-    this.ground.deleteBox(event, action);
-  }
   
-  /// It moves or rotates a box on the ground
-  /**
-   * @param event - Mouse information
-   * @param action - Which action is requested to be processed: select a box, move it, rotate it or finish the action.
-   */
-  moveBox (event, action) {
-    this.ground.moveBox (event, action);
-  }
-  
-  /// The crane can take a box
-  /**
-   * @return The new height of the hook, on the top of the taken box. Zero if no box is taken
-   */
-  takeBox () { 
-    var box = this.ground.takeBox (this.crane.getHookPosition());
-    if (box === null)
-      return 0; 
-    else 
-      return this.crane.takeBox (box); 
-    // The retuned height set the new limit to down the hook
-  }
-  
-  /// The crane drops its taken box
-  dropBox () {
-    var box = this.crane.dropBox ();
-    if (box !== null) {
-      box.position.copy (this.crane.getHookPosition());
-      box.position.y = 0;
-      this.ground.dropBox (box);
-    }
-  }
-  
-  /// It sets the crane position according to the GUI
+  /// It sets the robot position according to the GUI
   /**
    * @controls - The GUI information
    */
@@ -171,16 +115,6 @@ class TheScene extends THREE.Scene {
     //-----------------
     this.spotLight2.visible = controls.light2onoff;
     this.spotLight2.intensity = controls.lightIntensity2;
-
-
-    this.crane.setHookPosition (controls.rotation, controls.distance, controls.height);
-
-    //-----------------
-    //Disengage box
-    //-----------------
-    if (this.crane.getHookPosition().y >= 20) {
-      this.dropBox();
-    }
 
   }
   
