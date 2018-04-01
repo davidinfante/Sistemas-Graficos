@@ -16,6 +16,7 @@ class TheScene extends THREE.Scene {
     this.trackballControls = null;
     this.robot = null;
     this.ground = null;
+    this.fly = null;
     this.createLights ();
     this.createCamera (renderer);
     this.axis = new THREE.AxisHelper (25);
@@ -66,16 +67,18 @@ class TheScene extends THREE.Scene {
   createModel () {
     var loader = new THREE.TextureLoader();
     var textura = loader.load ("imgs/wood.jpg");
-
     var model = new THREE.Object3D();
-    //-----------------
-    //Texture
-    //-----------------
+
+    this.fly = new FlyObj();
+    model.add (this.fly);
+
     this.robot = new Robot();
     model.add (this.robot);
     
     this.ground = new Ground (200, 300, new THREE.MeshPhongMaterial ({map: textura}));
     model.add (this.ground);
+
+
     return model;
   }
 
@@ -89,6 +92,7 @@ class TheScene extends THREE.Scene {
     this.spotLight.visible = controls.light1onoff;
     this.spotLight.intensity = controls.lightIntensity;
     this.robot.animateRobot(controls.headRotation, controls.bodyRotation, controls.robotExtension);
+    this.fly.update();
   }
   
   /// It returns the camera

@@ -1,7 +1,7 @@
 
 /// The Ground class
 /**
- * @author FVelasco
+ * @author David Infante, Jose Ariza
  * 
  * @param aWidth - The width of the ground
  * @param aDeep - The deep of the ground
