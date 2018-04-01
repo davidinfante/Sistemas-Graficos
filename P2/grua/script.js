@@ -13,9 +13,6 @@ stats = null;
 /// A boolean to know if the left button of the mouse is down
 mouseDown = false;
 
-/// The current mode of the application
-applicationMode = TheScene.NO_ACTION;
-
 /// It creates the GUI and, optionally, adds statistic information
 /**
  * @param withStats - A boolean to show the statictics or not
@@ -23,102 +20,27 @@ applicationMode = TheScene.NO_ACTION;
 function createGUI (withStats) {
   GUIcontrols = new function() {
     this.axis = true;
-
     this.light1onoff = true;
     this.lightIntensity = 0.5;
-
-    //-----------------
-    //New Light
-    //-----------------
-    this.light2onoff = true;
-    this.lightIntensity2 = 0.5;
-
-    this.rotation = 6;
-    this.distance = 10;
-    this.height   = 10;
-
-    //-----------------
-    //Robot Init Position
-    //-----------------
-    this.robotinitpos = function () {
-      setMessage ("Posición inicial establecida");
-      this.rotation = 6;
-      this.distance = 10;
-      this.height   = 10;
-    };
-
-    this.addBox   = function () {
-      setMessage ("Añadir cajas clicando en el suelo");
-      applicationMode = TheScene.ADDING_BOXES;
-    };
-
-    //-----------------
-    //Deleting Boxes
-    //-----------------
-    this.deleteBox   = function () {
-      setMessage ("Borrar cajas clicando en ellas");
-      applicationMode = TheScene.DELETING_BOXES;
-    };
-
-    this.moveBox  = function () {
-      setMessage ("Mover y rotar cajas clicando en ellas");
-      applicationMode = TheScene.MOVING_BOXES;
-    };
-    this.takeBox  = false;
+    this.headRotation = 0;
+    this.bodyRotation = 0;
+    this.robotExtension = 0;
   }
-  
+
   var gui = new dat.GUI();
+
   var axisLights = gui.addFolder ('Axis and Lights');
     axisLights.add(GUIcontrols, 'axis').name('Axis on/off :');
-
     axisLights.add(GUIcontrols, 'light1onoff').name('Light1 on/off :');
-
     axisLights.add(GUIcontrols, 'lightIntensity', 0, 1.0).name('Light1 intensity :');
 
-    //-----------------
-    //New Light
-    //-----------------
-    axisLights.add(GUIcontrols, 'light2onoff').name('Light2 on/off :');
-    axisLights.add(GUIcontrols, 'lightIntensity2', 0, 1.0).name('Light2 intensity :');
+  var robotMovements = gui.addFolder ('Robor movements');
+    robotMovements.add(GUIcontrols, 'headRotation', -1.39, 1.39).name ('Rotate Head'); 
+    robotMovements.add(GUIcontrols, 'bodyRotation', -0.52, 0.78).name ('Rotate Body'); 
+    robotMovements.add(GUIcontrols, 'robotExtension', 0, 2).name ('Extend Robot');
 
-  
-  var actions = gui.addFolder ('Actions');
-    var addingBoxes = actions.add(GUIcontrols, 'addBox').name (': Adding boxes :');
-
-    //-----------------
-    //Deleting Boxes
-    //-----------------
-    var deletingBoxes = actions.add(GUIcontrols, 'deleteBox').name (': Deleting boxes :');
-
-    var movingBoxes = actions.add (GUIcontrols, 'moveBox').name (': Move and rotate boxes :');
-    var takingBoxes = actions.add (GUIcontrols, 'takeBox').name ('Take the box below');
-    takingBoxes.onChange (function (value) {
-        if (value) {
-        newHeight = scene.takeBox();
-          if (newHeight > 0) {
-              GUIcontrols.height = newHeight;
-              GUIcontrols.takeBox = true;
-          } else {
-              GUIcontrols.takeBox = false;
-          }
-        } else {
-          scene.dropBox ();
-        }
-    });
-  
-  var robotControls = gui.addFolder ('Robot Controls');
-    robotControls.add (GUIcontrols, 'rotation', 0, 12, 0.001).name('Rotation :');
-    robotControls.add (GUIcontrols, 'distance', 0, 50, 0.1).name('Distance :');
-    robotControls.add (GUIcontrols, 'height', 0, 50, 0.1).name('Height :').listen();
-    // The method  listen()  allows the height attribute to be written, not only read
-
-    //-----------------
-    //Robot Init Position
-    //-----------------
-    robotControls.add(GUIcontrols, 'robotinitpos').name('Robot initial position :');
-  
-  if (withStats)
-    stats = initStats();
+    if (withStats)
+      stats = initStats();
 }
 
 /// It adds statistics information to a previously created Div
@@ -126,18 +48,18 @@ function createGUI (withStats) {
  * @return The statistics object
  */
 function initStats() {
-  
+
   var stats = new Stats();
-  
+
   stats.setMode(0); // 0: fps, 1: ms
-  
+
   // Align top-left
   stats.domElement.style.position = 'absolute';
   stats.domElement.style.left = '0px';
   stats.domElement.style.top = '0px';
-  
+
   $("#Stats-output").append( stats.domElement );
-  
+
   return stats;
 }
 
@@ -157,86 +79,8 @@ function onMouseDown (event) {
   if (event.ctrlKey) {
     // The Trackballcontrol only works if Ctrl key is pressed
     scene.getCameraControls().enabled = true;
-  } else {  
+  } else {
     scene.getCameraControls().enabled = false;
-    if (event.button === 0) {   // Left button
-      mouseDown = true;
-      switch (applicationMode) {
-        case TheScene.ADDING_BOXES :
-          scene.addBox (event, TheScene.NEW_BOX);
-          break;
-
-        //-----------------
-        //Deleting Boxes
-        //-----------------
-        case TheScene.DELETING_BOXES :
-          scene.deleteBox (event, TheScene.DEL_BOX);
-          break;
-
-        case TheScene.MOVING_BOXES :
-          scene.moveBox (event, TheScene.SELECT_BOX);
-          break;
-        default :
-          applicationMode = TheScene.NO_ACTION;
-          break;
-      }
-    } else {
-      setMessage ("");
-      applicationMode = TheScene.NO_ACTION;
-    }
-  }
-}
-
-/// It processes the drag of the mouse
-/**
- * @param event - Mouse information
- */
-function onMouseMove (event) {
-  if (mouseDown) {
-    switch (applicationMode) {
-      case TheScene.ADDING_BOXES :
-      case TheScene.MOVING_BOXES :
-        scene.moveBox (event, TheScene.MOVE_BOX);
-        break;
-
-      //-----------------
-      //Deleting Boxes
-      //-----------------
-      case TheScene.DELETING_BOXES :
-
-      default :
-        applicationMode = TheScene.NO_ACTION;
-        break;
-    }
-  }
-}
-
-/// It processes the clic-up of the mouse
-/**
- * @param event - Mouse information
- */
-function onMouseUp (event) {
-  if (mouseDown) {
-    switch (applicationMode) {
-      case TheScene.ADDING_BOXES :
-        scene.addBox (event, TheScene.END_ACTION);
-        break;
-      case TheScene.MOVING_BOXES :
-        scene.moveBox (event, TheScene.END_ACTION);
-        break;
-
-      //-----------------
-      //Deleting Boxes
-      //-----------------
-      case TheScene.DELETING_BOXES :
-        scene.deleteBox (event, TheScene.END_ACTION);
-        break;
-
-      default :
-        applicationMode = TheScene.NO_ACTION;
-        break;
-    }
-    mouseDown = false;
   }
 }
 
@@ -248,22 +92,8 @@ function onMouseWheel (event) {
   if (event.ctrlKey) {
     // The Trackballcontrol only works if Ctrl key is pressed
     scene.getCameraControls().enabled = true;
-  } else {  
+  } else {
     scene.getCameraControls().enabled = false;
-    if (mouseDown) {
-      switch (applicationMode) {
-        case TheScene.MOVING_BOXES :
-          scene.moveBox (event, TheScene.ROTATE_BOX);
-          break;
-        
-        //-----------------
-        //Rotate Box
-        //-----------------
-        case TheScene.ADDING_BOXES :
-          scene.addBox (event, TheScene.ROTATE_BOX);
-          break;
-      }
-    }
   }
 }
 
@@ -282,17 +112,17 @@ function createRenderer () {
   renderer.setClearColor(new THREE.Color(0xEEEEEE), 1.0);
   renderer.setSize(window.innerWidth, window.innerHeight);
   renderer.shadowMap.enabled = true;
-  return renderer;  
+  return renderer;
 }
 
 /// It renders every frame
 function render() {
   requestAnimationFrame(render);
-  
+
   stats.update();
   scene.getCameraControls().update ();
   scene.animate(GUIcontrols);
-  
+
   renderer.render(scene, scene.getCamera());
 }
 
@@ -304,15 +134,13 @@ $(function () {
   $("#WebGL-output").append(renderer.domElement);
   // liseners
   window.addEventListener ("resize", onWindowResize);
-  window.addEventListener ("mousemove", onMouseMove, true);
   window.addEventListener ("mousedown", onMouseDown, true);
-  window.addEventListener ("mouseup", onMouseUp, true);
   window.addEventListener ("mousewheel", onMouseWheel, true);   // For Chrome an others
   window.addEventListener ("DOMMouseScroll", onMouseWheel, true); // For Firefox
-  
+
   // create a scene, that will hold all our elements such as objects, cameras and lights.
   scene = new TheScene (renderer.domElement);
- 
+
   createGUI(true);
 
   render();

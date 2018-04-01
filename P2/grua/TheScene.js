@@ -12,17 +12,10 @@ class TheScene extends THREE.Scene {
     
     this.ambientLight = null;
     this.spotLight = null;
-
-    //-----------------
-    //New Light
-    //-----------------
-    this.spotLight2 = null;
-
     this.camera = null;
     this.trackballControls = null;
     this.robot = null;
     this.ground = null;
-  
     this.createLights ();
     this.createCamera (renderer);
     this.axis = new THREE.AxisHelper (25);
@@ -64,18 +57,6 @@ class TheScene extends THREE.Scene {
     this.spotLight.shadow.mapSize.width=2048;
     this.spotLight.shadow.mapSize.height=2048;
     this.add (this.spotLight);
-
-    //-----------------
-    //New Light
-    //-----------------
-    // add spotlight for the shadows
-    this.spotLight2 = new THREE.SpotLight( 0xff0000 );
-    this.spotLight2.position.set( -60, 60, 40 );
-    this.spotLight2.castShadow = true;
-    // the shadow resolution
-    this.spotLight2.shadow.mapSize.width=2048;
-    this.spotLight2.shadow.mapSize.height=2048;
-    this.add (this.spotLight2);
   }
   
   /// It creates the geometric model: robot and ground
@@ -93,7 +74,7 @@ class TheScene extends THREE.Scene {
     this.robot = new Robot();
     model.add (this.robot);
     
-    this.ground = new Ground ();
+    this.ground = new Ground (200, 300, new THREE.MeshPhongMaterial ({map: textura}));
     model.add (this.ground);
     return model;
   }
@@ -105,17 +86,9 @@ class TheScene extends THREE.Scene {
    */
   animate (controls) {
     this.axis.visible = controls.axis;
-    
     this.spotLight.visible = controls.light1onoff;
-
     this.spotLight.intensity = controls.lightIntensity;
-    
-    //-----------------
-    //New Light
-    //-----------------
-    this.spotLight2.visible = controls.light2onoff;
-    this.spotLight2.intensity = controls.lightIntensity2;
-
+    this.robot.animateRobot(controls.headRotation, controls.bodyRotation, controls.robotExtension);
   }
   
   /// It returns the camera
@@ -144,28 +117,4 @@ class TheScene extends THREE.Scene {
   }
   
 }
-
-  // class variables
-  
-  // Application modes
-  TheScene.NO_ACTION = 0;
-  TheScene.ADDING_BOXES = 1;
-  TheScene.MOVING_BOXES = 2;
-
-  //-----------------
-  //Deleting Boxes
-  //-----------------
-  TheScene.DELETING_BOXES = 3;
-  
-  // Actions
-  TheScene.NEW_BOX = 0;
-  TheScene.MOVE_BOX = 1;
-  TheScene.SELECT_BOX = 2;
-  TheScene.ROTATE_BOX = 3;
-  TheScene.END_ACTION = 10;
-
-  //-----------------
-  //Deleting Boxes
-  //-----------------
-  TheScene.DEL_BOX = 4;
 

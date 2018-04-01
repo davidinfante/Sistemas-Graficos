@@ -1,16 +1,9 @@
 
 /// The Robot class
 /**
- * @author FVelasco
+ * @author David Infante, Jose Ariza
  * 
- * @param parameters = {
- *      robotHeight: <float>,
- *      robotWidth : <float>,
- *      material: <Material>
- * }
  */
-
-
 
 class Robot extends THREE.Object3D {
   
@@ -33,10 +26,10 @@ class Robot extends THREE.Object3D {
 
     
     // Objects for operating with the robot
-    this.leg        = null;
-    this.footL         = null;
-    this.footR         = null;
-    this.extension    = null;
+    this.root = null;
+    this.head = null;
+    this.body = null;
+    this.extension = null;
 
     //Provisional
     this.footHeight = 2;
@@ -56,19 +49,22 @@ class Robot extends THREE.Object3D {
     this.headRotation = 0;
     this.robotExtension = 0;
     
-    this.footL = this.createFoot("L");
-    this.footR = this.createFoot("R");
-    this.extension = this.createExtension();
-    // A way of feedback, a red jail will be visible around the robot when a box is taken by it
-    this.feedBack = new THREE.BoxHelper (this.legL, 0xFF0000);
-    this.feedBack.visible = false;
-    this.add (this.footL);
-    this.add (this.footR);
-    this.add (this.extension);
-    this.add (this.feedBack);
+    this.root = this.createRoot();
+    this.add (this.root);
   }
   
-
+  //It creates de tree's root 
+  createRoot(){
+    var root = new THREE.Object3D();
+    root.castShadow = true;
+    root.autoUpdateMatrix = false;
+    root.position.y = this.footHeight + this.legHeight + this.shoulderHeight/2;
+    root.updateMatrix();
+    root.add(this.createFoot("L"));
+    root.add(this.createFoot("R"));
+    root.add(this.createExtension());
+    return root;
+  }
 
 
   /// It creates the leg and the foot
@@ -103,36 +99,36 @@ class Robot extends THREE.Object3D {
 
   //It creates de animation of extension
   createExtension(){
-    var extension = new THREE.Object3D();
-    extension.position.y = this.robotExtension;
-    extension.add(this.createBody());
-    extension.add(this.createShoulders("R"));
-    extension.add(this.createShoulders("L"));
-    return extension;
+    this.extension = new THREE.Object3D();
+    this.extension.position.y = this.robotExtension;
+    this.extension.add(this.createBody());
+    this.extension.add(this.createShoulders("R"));
+    this.extension.add(this.createShoulders("L"));
+    return this.extension;
   }
 
   //It creates de body
   createBody(){
-    var body = new THREE.Mesh (
+    this.body = new THREE.Mesh (
       new THREE.CylinderGeometry (this.bodyWidth/2,this.bodyWidth/2, this.bodyHeight, 16, 8), this.material); 
     
-    body.geometry.applyMatrix (new THREE.Matrix4().makeTranslation (0, -this.bodyHeight/4, 0));
-    body.castShadow = true;
-    body.rotation.x = this.bodyRotation;
+    this.body.geometry.applyMatrix (new THREE.Matrix4().makeTranslation (0, -this.bodyHeight/4, 0));
+    this.body.castShadow = true;
+    this.body.rotation.x = this.bodyRotation;
     
-    body.add(this.createHead());
-    return body;
+    this.body.add(this.createHead());
+    return this.body;
   }
 
   //It creates the head and the eye
   createHead(){
     //Head
-    var head = new THREE.Mesh (
+    this.head = new THREE.Mesh (
       new THREE.SphereGeometry(this.bodyWidth/2.1, 20,20), this.material);
 
-    head.position.y = this.bodyHeight/4;
-    head.rotation.y = this.headRotation;
-    head.castShadow = true;
+    this.head.position.y = this.bodyHeight/4;
+    this.head.rotation.y = this.headRotation;
+    this.head.castShadow = true;
 
     //Eye
     var eye = new THREE.Mesh (
@@ -143,8 +139,8 @@ class Robot extends THREE.Object3D {
     eye.rotation.x = 1.5708;
     eye.castShadow = true;
 
-    head.add(eye);
-    return head;
+    this.head.add(eye);
+    return this.head;
   }
 
   //It creates the shoulders and the mini legs
@@ -170,6 +166,22 @@ class Robot extends THREE.Object3D {
       shoulder.add(miniLeg);
 
     return shoulder;
+  }
+
+  //It animates de robot
+  animateRobot(headRotation, bodyRotation, robotExtension){
+    //Head rotation
+    this.headRotation = headRotation;
+    this.head.rotation.y = this.headRotation;
+    //Body rotation
+    this.bodyRotation = bodyRotation;
+    this.body.rotation.x = this.bodyRotation;
+    //Robot extension
+    if(robotExtension > this.legHeight*20/100)
+      this.robotExtension = this.legHeight*20/100
+    else
+      this.robotExtension = robotExtension;
+    this.extension.position.y = this.robotExtension;
   }
 
   
