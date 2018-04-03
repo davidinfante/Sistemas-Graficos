@@ -3,13 +3,13 @@
 /**
  * @param renderer - The renderer to visualize the scene
  */
+ 
 class TheScene extends THREE.Scene {
   
   constructor (renderer) {
     super();
     
     // Attributes
-    
     this.ambientLight = null;
     this.spotLight = null;
     this.camera = null;

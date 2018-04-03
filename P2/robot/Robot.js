@@ -6,25 +6,12 @@
  */
 
 class Robot extends THREE.Object3D {
-  
-  //-----------------
-  //Texture
-  //-----------------
-  constructor (/*parameters*/aMaterial) {
+
+  constructor (aMaterial) {
     super();
-    
 
-    //-----------------
-    //Color Robot
-    //-----------------
-    //-----------------
-    //Texture
-    //-----------------
-    this.material    = aMaterial/*(parameters.material === undefined ? new THREE.MeshPhongMaterial ({color: 0xd4af37, specular: 0xfbf804, shininess: 70}) : parameters.material)*/;
-          
+    this.material = aMaterial;
 
-
-    
     // Objects for operating with the robot
     this.root = null;
     this.head = null;
@@ -54,7 +41,7 @@ class Robot extends THREE.Object3D {
   }
   
   //It creates de tree's root 
-  createRoot(){
+  createRoot() {
     var root = new THREE.Object3D();
     root.castShadow = true;
     root.autoUpdateMatrix = false;
@@ -65,7 +52,6 @@ class Robot extends THREE.Object3D {
     root.add(this.createExtension());
     return root;
   }
-
 
   /// It creates the leg and the foot
   createFoot (tipo) {
@@ -98,7 +84,7 @@ class Robot extends THREE.Object3D {
   }
 
   //It creates de animation of extension
-  createExtension(){
+  createExtension() {
     this.extension = new THREE.Object3D();
     this.extension.position.y = this.robotExtension;
     this.extension.add(this.createBody());
@@ -108,7 +94,7 @@ class Robot extends THREE.Object3D {
   }
 
   //It creates de body
-  createBody(){
+  createBody() {
     this.body = new THREE.Mesh (
       new THREE.CylinderGeometry (this.bodyWidth/2,this.bodyWidth/2, this.bodyHeight, 16, 8), this.material); 
     
@@ -121,7 +107,7 @@ class Robot extends THREE.Object3D {
   }
 
   //It creates the head and the eye
-  createHead(){
+  createHead() {
     //Head
     this.head = new THREE.Mesh (
       new THREE.SphereGeometry(this.bodyWidth/2.1, 20,20), this.material);
@@ -144,7 +130,7 @@ class Robot extends THREE.Object3D {
   }
 
   //It creates the shoulders and the mini legs
-  createShoulders(tipo){
+  createShoulders(tipo) {
     //Shoulder
     var shoulder = new THREE.Mesh (
       new THREE.BoxGeometry (this.shoulderHeight, this.shoulderHeight, this.shoulderHeight), this.material); 
@@ -169,7 +155,7 @@ class Robot extends THREE.Object3D {
   }
 
   //It animates de robot
-  animateRobot(headRotation, bodyRotation, robotExtension){
+  animateRobot(headRotation, bodyRotation, robotExtension) {
     //Head rotation
     this.headRotation = headRotation;
     this.head.rotation.y = this.headRotation;
