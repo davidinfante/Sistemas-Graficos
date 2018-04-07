@@ -17,6 +17,7 @@ class Robot extends THREE.Object3D {
     this.head = null;
     this.body = null;
     this.extension = null;
+    this.cover = null;
 
     //Provisional
     this.footHeight = 2;
@@ -31,6 +32,8 @@ class Robot extends THREE.Object3D {
     this.bodyHeight = 16;
     this.bodyWidth = 8;
 
+    this.radio = 0;
+
     //Animation robot
     this.bodyRotation = 0;
     this.headRotation = 0;
@@ -39,18 +42,37 @@ class Robot extends THREE.Object3D {
     this.root = this.createRoot();
     this.add (this.root);
   }
+
+  getParameters(){
+    var pos = new THREE.Vector3();
+    pos.setFromMatrixPosition (this.cover.matrixWorld);
+    var parameters = {pos: pos, radio: this.radio};
+    return parameters;
+  }
   
   //It creates de tree's root 
   createRoot() {
     var root = new THREE.Object3D();
     root.castShadow = true;
-    root.autoUpdateMatrix = false;
     root.position.y = this.footHeight + this.legHeight + this.shoulderHeight/2;
-    root.updateMatrix();
+    root.position.z = 100;
+    root.rotation.y = 3.14;
     root.add(this.createFoot("L"));
     root.add(this.createFoot("R"));
     root.add(this.createExtension());
+    root.add(this.createCover());
     return root;
+  }
+
+  createCover(){
+
+    var height = this.footHeight + this.legHeight + this.robotExtension + this.shoulderHeight/2
+      + this.bodyHeight/4 + this.bodyWidth/2;
+    this.radio = height/2;
+    this.cover = new THREE.Mesh (
+      new THREE.SphereGeometry(this.radio, 20,20), this.material);
+    this.cover.position.y = -(this.radio - (this.bodyHeight/4 + this.bodyWidth/2));
+    return this.cover;
   }
 
   /// It creates the leg and the foot

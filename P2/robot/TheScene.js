@@ -16,7 +16,9 @@ class TheScene extends THREE.Scene {
     this.trackballControls = null;
     this.robot = null;
     this.ground = null;
-    this.fly = null;
+    this.timePast = Date.now();
+    this.maxFly = 10;
+    this.fly = [];
     this.createLights ();
     this.createCamera (renderer);
     this.axis = new THREE.AxisHelper (25);
@@ -52,7 +54,7 @@ class TheScene extends THREE.Scene {
     
     // add spotlight for the shadows
     this.spotLight = new THREE.SpotLight( 0xffffff );
-    this.spotLight.position.set( 60, 60, 40 );
+    this.spotLight.position.set( 100, 60, 0 );
     this.spotLight.castShadow = true;
     // the shadow resolution
     this.spotLight.shadow.mapSize.width=2048;
@@ -69,15 +71,16 @@ class TheScene extends THREE.Scene {
     var textura = loader.load ("imgs/wood.jpg");
     var model = new THREE.Object3D();
 
-    this.fly = new FlyObj();
-    model.add (this.fly);
+    for(var i=0;i<this.maxFly;++i){
+      this.fly[i] = new FlyObj();
+      model.add(this.fly[i]);
+    }
 
     this.robot = new Robot();
     model.add (this.robot);
     
     this.ground = new Ground (200, 300, new THREE.MeshPhongMaterial ({map: textura}));
     model.add (this.ground);
-
 
     return model;
   }
@@ -92,7 +95,33 @@ class TheScene extends THREE.Scene {
     this.spotLight.visible = controls.light1onoff;
     this.spotLight.intensity = controls.lightIntensity;
     this.robot.animateRobot(controls.headRotation, controls.bodyRotation, controls.robotExtension);
-    this.fly.update();
+
+    /* Para que cada bola salga cada 2 segundos, poco útil
+    var timeActual = Date.now();
+
+    if(this.maxFly<10 && (timeActual-this.timePast > 2000)){
+      this.fly[this.maxFly].launch();
+      this.maxFly++;
+      this.timePast = Date.now();
+    }
+    */
+    for(var i=0;i<this.maxFly;++i){
+      this.fly[i].update();
+    }
+    this.manageCollitions();
+  }
+
+  // It manages the collitions between the objects and the robot
+  manageCollitions (){
+    var paramRobot = this.robot.getParameters();
+    for(var i=0;i<this.maxFly;++i){
+      var paramFly = this.fly[i].getParameters();
+      var distance = Math.sqrt(Math.pow((paramFly.x - paramRobot.pos.x),2) + Math.pow((paramFly.y - paramRobot.pos.y),2)
+        + Math.pow((paramFly.z - paramRobot.pos.z),2));
+
+      if(distance <= (paramRobot.radio + paramFly.radio))
+        this.fly[i].setCollision();
+    }
   }
   
   /// It returns the camera
