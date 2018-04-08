@@ -33,8 +33,8 @@ class TheScene extends THREE.Scene {
    */
   createCamera (renderer) {
     this.camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
-    this.camera.position.set (60, 30, 60);
-    var look = new THREE.Vector3 (0,20,0);
+    this.camera.position.set (0, 200, 200);
+    var look = new THREE.Vector3 (0,20,50);
     this.camera.lookAt(look);
 
     this.trackballControls = new THREE.TrackballControls (this.camera, renderer);
@@ -71,7 +71,7 @@ class TheScene extends THREE.Scene {
     var textura = loader.load ("imgs/wood.jpg");
     var model = new THREE.Object3D();
 
-    for(var i=0;i<this.maxFly;++i){
+    for(var i = 0; i < this.maxFly; ++i){
       this.fly[i] = new FlyObj();
       model.add(this.fly[i]);
     }
@@ -124,6 +124,22 @@ class TheScene extends THREE.Scene {
     }
   }
   
+  moveForwRobot () {
+    this.robot.position.z -= 1;
+  }
+
+  moveBackRobot () {
+    this.robot.position.z += 1;
+  }
+
+  moveLeftRobot () {
+    this.robot.position.x -= 1;
+  }
+
+  moveRightRobot () {
+    this.robot.position.x += 1;
+  }
+
   /// It returns the camera
   /**
    * @return The camera

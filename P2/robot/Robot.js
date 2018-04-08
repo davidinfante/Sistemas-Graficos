@@ -17,7 +17,7 @@ class Robot extends THREE.Object3D {
     this.head = null;
     this.body = null;
     this.extension = null;
-    this.cover = null;
+    this.hitbox = null;
 
     //Provisional
     this.footHeight = 2;
@@ -40,18 +40,19 @@ class Robot extends THREE.Object3D {
     this.robotExtension = 0;
     
     this.root = this.createRoot();
+    this.root.add(this.createHitbox());
     this.add (this.root);
   }
 
   getParameters(){
     var pos = new THREE.Vector3();
-    pos.setFromMatrixPosition (this.cover.matrixWorld);
+    pos.setFromMatrixPosition (this.hitbox.matrixWorld);
     var parameters = {pos: pos, radio: this.radio};
     return parameters;
   }
   
   //It creates de tree's root 
-  createRoot() {
+  createRoot () {
     var root = new THREE.Object3D();
     root.castShadow = true;
     root.position.y = this.footHeight + this.legHeight + this.shoulderHeight/2;
@@ -60,19 +61,20 @@ class Robot extends THREE.Object3D {
     root.add(this.createFoot("L"));
     root.add(this.createFoot("R"));
     root.add(this.createExtension());
-    root.add(this.createCover());
     return root;
   }
 
-  createCover(){
-
+  //It creates the robot's hitbox
+  createHitbox () {
     var height = this.footHeight + this.legHeight + this.robotExtension + this.shoulderHeight/2
       + this.bodyHeight/4 + this.bodyWidth/2;
     this.radio = height/2;
-    this.cover = new THREE.Mesh (
+    this.hitbox = new THREE.Mesh (
       new THREE.SphereGeometry(this.radio, 20,20), this.material);
-    this.cover.position.y = -(this.radio - (this.bodyHeight/4 + this.bodyWidth/2));
-    return this.cover;
+    this.hitbox.position.y = -(this.radio - (this.bodyHeight/4 + this.bodyWidth/2)) + this.robotExtension;
+    this.hitbox.material.transparent = true;
+    this.hitbox.material.opacity = 0.2;
+    return this.hitbox;
   }
 
   /// It creates the leg and the foot
@@ -185,11 +187,13 @@ class Robot extends THREE.Object3D {
     this.bodyRotation = bodyRotation;
     this.body.rotation.x = this.bodyRotation;
     //Robot extension
-    if(robotExtension > this.legHeight*20/100)
-      this.robotExtension = this.legHeight*20/100
-    else
+    if (robotExtension != this.robotExtension) {
       this.robotExtension = robotExtension;
-    this.extension.position.y = this.robotExtension;
+      this.extension.position.y = this.robotExtension;
+      this.root.remove(this.hitbox);
+      this.root.add(this.createHitbox());
+    }
+    
   }
 
   
