@@ -196,5 +196,23 @@ class Robot extends THREE.Object3D {
     
   }
 
+  rotateRobot(type){
+    if(type=="L")
+      this.root.rotation.y += 0.1;
+    else
+      this.root.rotation.y -= 0.1; 
+  }
+
+  moveRobotTank(type){
+    if(type=="F") {
+      this.root.position.z += Math.cos(this.root.rotation.y);
+      this.root.position.x += Math.sin(this.root.rotation.y); 
+    }
+    else {
+      this.root.position.z -= Math.cos(this.root.rotation.y);
+      this.root.position.x -= Math.sin(this.root.rotation.y);
+    }
+  }
+
   
 }

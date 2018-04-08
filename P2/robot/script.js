@@ -104,6 +104,18 @@ function onKeyDown (event) {
     case 68:
       scene.moveRightRobot();
     break;
+    case 37:
+      scene.rotateRobot("L");
+    break;
+    case 39:
+      scene.rotateRobot("R");
+    break;
+    case 38:
+      scene.moveRobotTank("F");
+    break;
+    case 40:
+      scene.moveRobotTank("B");
+    break;
   }
 }
 

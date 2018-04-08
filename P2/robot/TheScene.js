@@ -140,6 +140,14 @@ class TheScene extends THREE.Scene {
     this.robot.position.x += 1;
   }
 
+  rotateRobot(type){
+    this.robot.rotateRobot(type);
+  }
+
+  moveRobotTank(type){
+    this.robot.moveRobotTank(type);
+  }
+
   /// It returns the camera
   /**
    * @return The camera
