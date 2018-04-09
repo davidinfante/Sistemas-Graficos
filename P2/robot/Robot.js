@@ -196,7 +196,7 @@ class Robot extends THREE.Object3D {
     return shoulder;
   }
 
-  //It animates de robot
+  //It animates the robot
   animateRobot(headRotation, bodyRotation, robotExtension) {
     //Head rotation
     this.headRotation = headRotation;
@@ -214,14 +214,16 @@ class Robot extends THREE.Object3D {
     
   }
 
-  rotateRobot(type){
+  //It rotates the robot
+  rotateRobot(type) {
     if(type=="L")
       this.root.rotation.y += 0.2;
     else
       this.root.rotation.y -= 0.2; 
   }
 
-  moveRobotTank(type){
+  //It moves the robot with a tank type movement
+  moveRobotTank(type) {
     if(type=="F") {
       this.root.position.z += 2*Math.cos(this.root.rotation.y);
       this.root.position.x += 2*Math.sin(this.root.rotation.y); 

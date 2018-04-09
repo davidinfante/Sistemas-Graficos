@@ -19,7 +19,7 @@ mouseDown = false;
  */
 function createGUI (withStats) {
   GUIcontrols = new function() {
-    this.axis = true;
+    this.axis = false;
     this.light1onoff = true;
     this.lightIntensity = 0.5;
     this.headRotation = 0;

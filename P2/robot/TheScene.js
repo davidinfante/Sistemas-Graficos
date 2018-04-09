@@ -10,6 +10,7 @@ class TheScene extends THREE.Scene {
     super();
     
     // Attributes
+    this.hud = null;
     this.ambientLight = null;
     this.spotLight = null;
     this.camera = null;
@@ -25,6 +26,9 @@ class TheScene extends THREE.Scene {
     this.add (this.axis);
     this.model = this.createModel ();
     this.add (this.model);
+
+    this.health = 3;
+    this.lastHealth = 3;
   }
   
   /// It creates the camera and adds it to the graph
@@ -43,6 +47,16 @@ class TheScene extends THREE.Scene {
     this.trackballControls.panSpeed = 0.5;
     this.trackballControls.target = look;
     
+    //HUD creation
+    var loader = new THREE.TextureLoader();
+    var textura = loader.load ("imgs/lifebar3.png");
+    this.hud = new HUD(new THREE.MeshBasicMaterial({map: textura}));
+    this.camera.add(this.hud);
+    //Place it in the center
+    var hudPositionX = (41 / 100) * 2 - 1;
+    var hudPositionY = (55.5 / 100) * 2 - 1;
+    this.hud.position.set(hudPositionX, hudPositionY, -0.3);
+
     this.add(this.camera);
   }
   
@@ -70,9 +84,16 @@ class TheScene extends THREE.Scene {
     var loader = new THREE.TextureLoader();
     var model = new THREE.Object3D();
 
-    var textura = loader.load ("imgs/cabesaxD.jpg");
+    var texturaGood = loader.load ("imgs/cabesaxD.jpg");
+    var texturaBad = loader.load ("imgs/puma.jpg");
     for(var i = 0; i < this.maxFly; ++i){
-      this.fly[i] = new FlyObj(new THREE.MeshPhongMaterial ({map: textura}));
+      if (Math.floor(Math.random() * 10) < 5) {
+        this.fly[i] = new FlyObj(new THREE.MeshPhongMaterial ({map: texturaGood}));
+        this.fly[i].setBehaviour(true); //Good
+      } else {
+        this.fly[i] = new FlyObj(new THREE.MeshPhongMaterial ({map: texturaBad}));
+        this.fly[i].setBehaviour(false); //Bad
+      }
       model.add(this.fly[i]);
     }
 
@@ -98,55 +119,85 @@ class TheScene extends THREE.Scene {
     this.spotLight.intensity = controls.lightIntensity;
     this.robot.animateRobot(controls.headRotation, controls.bodyRotation, controls.robotExtension);
 
-    /* Para que cada bola salga cada 2 segundos, poco útil
-    var timeActual = Date.now();
-
-    if(this.maxFly<10 && (timeActual-this.timePast > 2000)){
-      this.fly[this.maxFly].launch();
-      this.maxFly++;
-      this.timePast = Date.now();
-    }
-    */
-    for(var i=0;i<this.maxFly;++i){
+    for(var i = 0; i < this.maxFly; ++i) {
       this.fly[i].update();
     }
     this.manageCollitions();
+
+    //Manages the HUD's lifebar
+    if (this.health != this.lastHealth) {
+      var loader = new THREE.TextureLoader();
+      var hudPositionX = (41 / 100) * 2 - 1;
+      var hudPositionY = (55.5 / 100) * 2 - 1;
+      switch(this.health) {
+        case 3:
+          this.camera.remove(this.hud);
+          var textura = loader.load ("imgs/lifebar3.png");
+          this.hud = new HUD(new THREE.MeshBasicMaterial({map: textura}));
+          this.camera.add(this.hud);
+          //Place it in the center
+          this.hud.position.set(hudPositionX, hudPositionY, -0.3);
+        break;
+        case 2:
+          this.camera.remove(this.hud);
+          var textura = loader.load ("imgs/lifebar2.png");
+          this.hud = new HUD(new THREE.MeshBasicMaterial({map: textura}));
+          this.camera.add(this.hud);
+          //Place it in the center
+          this.hud.position.set(hudPositionX, hudPositionY, -0.3);
+        break;
+        case 1:
+          this.camera.remove(this.hud);
+          var textura = loader.load ("imgs/lifebar1.png");
+          this.hud = new HUD(new THREE.MeshBasicMaterial({map: textura}));
+          this.camera.add(this.hud);
+          //Place it in the center
+          this.hud.position.set(hudPositionX, hudPositionY, -0.3);
+        break;
+      }
+    }
+    this.lastHealth = this.health;
+
   }
 
   // It manages the collitions between the objects and the robot
-  manageCollitions (){
+  manageCollitions () {
     var paramRobot = this.robot.getParameters();
-    for(var i=0;i<this.maxFly;++i){
+    for(var i = 0; i < this.maxFly; ++i) {
       var paramFly = this.fly[i].getParameters();
       var distance = Math.sqrt(Math.pow((paramFly.x - paramRobot.pos.x),2) + Math.pow((paramFly.y - paramRobot.pos.y),2)
         + Math.pow((paramFly.z - paramRobot.pos.z),2));
 
-      if(distance <= (paramRobot.radio + paramFly.radio))
+      if (distance <= (paramRobot.radio + paramFly.radio)) {
         this.fly[i].setCollision();
+        if (!paramFly.behaviour && this.health > 1) --this.health;
+        else if (paramFly.behaviour && this.health < 3) ++this.health;
+      }
     }
   }
   
+  //All the Robot movement funcs
   moveForwRobot () {
-    this.robot.position.z -= 1;
+    this.robot.position.z -= 2;
   }
 
   moveBackRobot () {
-    this.robot.position.z += 1;
+    this.robot.position.z += 2;
   }
 
   moveLeftRobot () {
-    this.robot.position.x -= 1;
+    this.robot.position.x -= 2;
   }
 
   moveRightRobot () {
-    this.robot.position.x += 1;
+    this.robot.position.x += 2;
   }
 
-  rotateRobot(type){
+  rotateRobot(type) {
     this.robot.rotateRobot(type);
   }
 
-  moveRobotTank(type){
+  moveRobotTank(type) {
     this.robot.moveRobotTank(type);
   }
 
