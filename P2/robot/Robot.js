@@ -70,10 +70,10 @@ class Robot extends THREE.Object3D {
       + this.bodyHeight/4 + this.bodyWidth/2;
     this.radio = height/2;
     this.hitbox = new THREE.Mesh (
-      new THREE.SphereGeometry(this.radio, 20,20), this.material);
+      new THREE.SphereGeometry(this.radio, 20,20));
     this.hitbox.position.y = -(this.radio - (this.bodyHeight/4 + this.bodyWidth/2)) + this.robotExtension;
     this.hitbox.material.transparent = true;
-    this.hitbox.material.opacity = 0.2;
+    this.hitbox.material.opacity = 0.0;
     return this.hitbox;
   }
 
@@ -148,9 +148,27 @@ class Robot extends THREE.Object3D {
     eye.position.z = this.bodyWidth/2.5;
     eye.rotation.x = 1.5708;
     eye.castShadow = true;
+    eye.add(this.createLight());
 
     this.head.add(eye);
     return this.head;
+  }
+
+  createLight() {
+    var robotLight = new THREE.SpotLight( 0xffffff );
+    robotLight.position.set(0, this.bodyWidth/4, this.bodyWidth/2.5);
+    robotLight.castShadow = true;
+    robotLight.shadow.mapSize.width=2048;
+    robotLight.shadow.mapSize.height=2048;
+    robotLight.angle = 0.8;
+    robotLight.penumbra = 0.5;
+    var targetLight = new THREE.Object3D();
+    targetLight.position.set(0, 1, 0);
+    robotLight.target = targetLight;
+    
+    robotLight.add(targetLight);
+
+    return robotLight;
   }
 
   //It creates the shoulders and the mini legs
@@ -198,19 +216,19 @@ class Robot extends THREE.Object3D {
 
   rotateRobot(type){
     if(type=="L")
-      this.root.rotation.y += 0.1;
+      this.root.rotation.y += 0.2;
     else
-      this.root.rotation.y -= 0.1; 
+      this.root.rotation.y -= 0.2; 
   }
 
   moveRobotTank(type){
     if(type=="F") {
-      this.root.position.z += Math.cos(this.root.rotation.y);
-      this.root.position.x += Math.sin(this.root.rotation.y); 
+      this.root.position.z += 2*Math.cos(this.root.rotation.y);
+      this.root.position.x += 2*Math.sin(this.root.rotation.y); 
     }
     else {
-      this.root.position.z -= Math.cos(this.root.rotation.y);
-      this.root.position.x -= Math.sin(this.root.rotation.y);
+      this.root.position.z -= 2*Math.cos(this.root.rotation.y);
+      this.root.position.x -= 2*Math.sin(this.root.rotation.y);
     }
   }
 

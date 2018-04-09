@@ -54,7 +54,7 @@ class TheScene extends THREE.Scene {
     
     // add spotlight for the shadows
     this.spotLight = new THREE.SpotLight( 0xffffff );
-    this.spotLight.position.set( 100, 60, 0 );
+    this.spotLight.position.set( 0, 110, 0 );
     this.spotLight.castShadow = true;
     // the shadow resolution
     this.spotLight.shadow.mapSize.width=2048;
@@ -68,17 +68,19 @@ class TheScene extends THREE.Scene {
    */
   createModel () {
     var loader = new THREE.TextureLoader();
-    var textura = loader.load ("imgs/wood.jpg");
     var model = new THREE.Object3D();
 
+    var textura = loader.load ("imgs/cabesaxD.jpg");
     for(var i = 0; i < this.maxFly; ++i){
-      this.fly[i] = new FlyObj();
+      this.fly[i] = new FlyObj(new THREE.MeshPhongMaterial ({map: textura}));
       model.add(this.fly[i]);
     }
 
-    this.robot = new Robot();
+    var textura = loader.load ("imgs/r2d2.png");
+    this.robot = new Robot(new THREE.MeshPhongMaterial ({map: textura}));
     model.add (this.robot);
     
+    var textura = loader.load ("imgs/cancha.jpg");
     this.ground = new Ground (200, 300, new THREE.MeshPhongMaterial ({map: textura}));
     model.add (this.ground);
 
@@ -146,6 +148,10 @@ class TheScene extends THREE.Scene {
 
   moveRobotTank(type){
     this.robot.moveRobotTank(type);
+  }
+
+  changeView(){
+    
   }
 
   /// It returns the camera

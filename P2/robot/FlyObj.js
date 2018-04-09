@@ -6,10 +6,10 @@
 
 class FlyObj extends THREE.Mesh {
     
-    constructor(){
+    constructor(aMaterial){
         super();
 
-        //this.material = aMaterial;
+        this.material = aMaterial;
         this.objWidth = 8;
         this.ball = null;
         this.speed = null;

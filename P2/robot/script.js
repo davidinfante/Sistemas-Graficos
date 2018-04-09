@@ -116,6 +116,9 @@ function onKeyDown (event) {
     case 40:
       scene.moveRobotTank("B");
     break;
+    case 86:
+      scene.changeView();
+    break;
   }
 }
 
