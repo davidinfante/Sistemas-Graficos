@@ -57,19 +57,24 @@ class TheScene extends THREE.Scene {
     var hudPositionX = (41 / 100) * 2 - 1;
     var hudPositionY = (55.5 / 100) * 2 - 1;
     this.hud.position.set(hudPositionX, hudPositionY, -0.3);
-
-    var material = new THREE.MeshPhongMaterial({
-      color: 0xdddddd
+    
+    var aux = this.camera;
+    var loader = new THREE.FontLoader();
+loader.load( 'fonts/Lemon_Milk_Regular.json', function ( font ) {
+    var textGeo = new THREE.TextGeometry( "10", {
+        font: font,
+        size: 20, // font size
+        height: 10, // how much extrusion (how thick / deep are the letters
+        bevelEnabled: false
     });
-    /*
-    var textGeom = new THREE.TextGeometry( 'Hello World!', {
-      font: 'helvetiker' // Must be lowercase!
-    });
-
-    var textMesh = new THREE.Mesh( textGeom, material );
-
-    this.add( textMesh );
-    */
+    textGeo.computeBoundingBox();
+    var textMaterial = new THREE.MeshBasicMaterial( { color: 0xff0000, specular: 0xffffff } );
+    var mesh = new THREE.Mesh( textGeo, textMaterial );
+    mesh.position.set(80, -70, -200);
+    mesh.castShadow = false;
+    mesh.receiveShadow = false;
+    aux.add( mesh );
+});
 
     this.add(this.camera);
   }
