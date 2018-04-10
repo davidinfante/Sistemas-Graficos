@@ -6,7 +6,7 @@
 
 class FlyObj extends THREE.Mesh {
     
-    constructor(aMaterial) {
+    constructor(aMaterial, aBehavior) {
         super();
 
         this.material = aMaterial;
@@ -17,7 +17,7 @@ class FlyObj extends THREE.Mesh {
         this.speed = null;
         this.collision = false;
         //Good or bad :p
-        this.behaviour = null;
+        this.behaviour = aBehavior;
         this.createObject();
     }
 
@@ -29,11 +29,6 @@ class FlyObj extends THREE.Mesh {
 
     setCollision() {
         this.collision = true;
-    }
-
-    setBehaviour(bool) {
-        if (bool) this.behaviour = true;
-        else this.behaviour = false;
     }
 
     createObject() {

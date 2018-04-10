@@ -11,6 +11,7 @@ class TheScene extends THREE.Scene {
     
     // Attributes
     this.hud = null;
+    this.marker = null;
     this.ambientLight = null;
     this.spotLight = null;
     this.camera = null;
@@ -49,13 +50,26 @@ class TheScene extends THREE.Scene {
     
     //HUD creation
     var loader = new THREE.TextureLoader();
-    var textura = loader.load ("imgs/lifebar3.png");
-    this.hud = new HUD(new THREE.MeshBasicMaterial({map: textura}));
+    var texture  = loader.load ("imgs/lifebar3.png");
+    this.hud = new HUD(new THREE.MeshBasicMaterial({map: texture }));
     this.camera.add(this.hud);
     //Place it in the center
     var hudPositionX = (41 / 100) * 2 - 1;
     var hudPositionY = (55.5 / 100) * 2 - 1;
     this.hud.position.set(hudPositionX, hudPositionY, -0.3);
+
+    var material = new THREE.MeshPhongMaterial({
+      color: 0xdddddd
+    });
+    /*
+    var textGeom = new THREE.TextGeometry( 'Hello World!', {
+      font: 'helvetiker' // Must be lowercase!
+    });
+
+    var textMesh = new THREE.Mesh( textGeom, material );
+
+    this.add( textMesh );
+    */
 
     this.add(this.camera);
   }
@@ -83,26 +97,27 @@ class TheScene extends THREE.Scene {
   createModel () {
     var loader = new THREE.TextureLoader();
     var model = new THREE.Object3D();
+    var texture = null;
 
-    var texturaGood = loader.load ("imgs/cabesaxD.jpg");
-    var texturaBad = loader.load ("imgs/puma.jpg");
+    var behaviour = null;
     for(var i = 0; i < this.maxFly; ++i){
       if (Math.floor(Math.random() * 10) < 5) {
-        this.fly[i] = new FlyObj(new THREE.MeshPhongMaterial ({map: texturaGood}));
-        this.fly[i].setBehaviour(true); //Good
+        behaviour = true;
+        texture = loader.load ("imgs/cabesaxD.jpg");
       } else {
-        this.fly[i] = new FlyObj(new THREE.MeshPhongMaterial ({map: texturaBad}));
-        this.fly[i].setBehaviour(false); //Bad
+        behaviour = false;
+        texture = loader.load ("imgs/puma.jpg");
       }
+      this.fly[i] = new FlyObj(new THREE.MeshPhongMaterial ({map: texture}), behaviour);
       model.add(this.fly[i]);
     }
 
-    var textura = loader.load ("imgs/r2d2.png");
-    this.robot = new Robot(new THREE.MeshPhongMaterial ({map: textura}));
+    texture = loader.load ("imgs/r2d2.png");
+    this.robot = new Robot(new THREE.MeshPhongMaterial ({map: texture}));
     model.add (this.robot);
     
-    var textura = loader.load ("imgs/cancha.jpg");
-    this.ground = new Ground (200, 300, new THREE.MeshPhongMaterial ({map: textura}));
+    texture = loader.load ("imgs/cancha.jpg");
+    this.ground = new Ground (200, 300, new THREE.MeshPhongMaterial ({map: texture}));
     model.add (this.ground);
 
     return model;
@@ -122,34 +137,40 @@ class TheScene extends THREE.Scene {
     for(var i = 0; i < this.maxFly; ++i) {
       this.fly[i].update();
     }
-    this.manageCollitions();
 
-    //Manages the HUD's lifebar
+    this.manageCollitions();
+    this.manageHUD();
+
+  }
+
+  //Manages the HUD's lifebar
+  manageHUD () {
     if (this.health != this.lastHealth) {
       var loader = new THREE.TextureLoader();
+      var texture = null;
       var hudPositionX = (41 / 100) * 2 - 1;
       var hudPositionY = (55.5 / 100) * 2 - 1;
       switch(this.health) {
         case 3:
           this.camera.remove(this.hud);
-          var textura = loader.load ("imgs/lifebar3.png");
-          this.hud = new HUD(new THREE.MeshBasicMaterial({map: textura}));
+          texture  = loader.load ("imgs/lifebar3.png");
+          this.hud = new HUD(new THREE.MeshBasicMaterial({map: texture }));
           this.camera.add(this.hud);
           //Place it in the center
           this.hud.position.set(hudPositionX, hudPositionY, -0.3);
         break;
         case 2:
           this.camera.remove(this.hud);
-          var textura = loader.load ("imgs/lifebar2.png");
-          this.hud = new HUD(new THREE.MeshBasicMaterial({map: textura}));
+          texture  = loader.load ("imgs/lifebar2.png");
+          this.hud = new HUD(new THREE.MeshBasicMaterial({map: texture }));
           this.camera.add(this.hud);
           //Place it in the center
           this.hud.position.set(hudPositionX, hudPositionY, -0.3);
         break;
         case 1:
           this.camera.remove(this.hud);
-          var textura = loader.load ("imgs/lifebar1.png");
-          this.hud = new HUD(new THREE.MeshBasicMaterial({map: textura}));
+          texture  = loader.load ("imgs/lifebar1.png");
+          this.hud = new HUD(new THREE.MeshBasicMaterial({map: texture }));
           this.camera.add(this.hud);
           //Place it in the center
           this.hud.position.set(hudPositionX, hudPositionY, -0.3);
@@ -157,7 +178,6 @@ class TheScene extends THREE.Scene {
       }
     }
     this.lastHealth = this.health;
-
   }
 
   // It manages the collitions between the objects and the robot
