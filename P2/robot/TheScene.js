@@ -20,16 +20,24 @@ class TheScene extends THREE.Scene {
     this.ground = null;
     this.timePast = Date.now();
     this.maxFly = 10;
+
+    this.hudPositionX = -0.23;//(60 / 100) * 2 - 1;
+    this.hudPositionY = 0.11;//(50 / 100) * 2 - 1;
+    this.hudPositionZ = -0.3;
+
+    this.lastHealth = 100;
+    this.health = 100;
+    this.score = 0;
+
     this.fly = [];
     this.createLights ();
+    this.createMarker();
     this.createCamera (renderer);
     this.axis = new THREE.AxisHelper (25);
     this.add (this.axis);
     this.model = this.createModel ();
     this.add (this.model);
 
-    this.health = 3;
-    this.lastHealth = 3;
   }
   
   /// It creates the camera and adds it to the graph
@@ -51,33 +59,27 @@ class TheScene extends THREE.Scene {
     //HUD creation
     var loader = new THREE.TextureLoader();
     var texture  = loader.load ("imgs/lifebar3.png");
-    this.hud = new HUD(new THREE.MeshBasicMaterial({map: texture }));
+    this.hud = new HUD(new THREE.MeshBasicMaterial({map: texture }), this.health);
     this.camera.add(this.hud);
-    //Place it in the center
-    var hudPositionX = (41 / 100) * 2 - 1;
-    var hudPositionY = (55.5 / 100) * 2 - 1;
-    this.hud.position.set(hudPositionX, hudPositionY, -0.3);
-    
-    var aux = this.camera;
-    var loader = new THREE.FontLoader();
-loader.load( 'fonts/Lemon_Milk_Regular.json', function ( font ) {
-    var textGeo = new THREE.TextGeometry( "10", {
-        font: font,
-        size: 20, // font size
-        height: 10, // how much extrusion (how thick / deep are the letters
-        bevelEnabled: false
-    });
-    textGeo.computeBoundingBox();
-    var textMaterial = new THREE.MeshBasicMaterial( { color: 0xff0000, specular: 0xffffff } );
-    var mesh = new THREE.Mesh( textGeo, textMaterial );
-    mesh.position.set(80, -70, -200);
-    mesh.castShadow = false;
-    mesh.receiveShadow = false;
-    aux.add( mesh );
-});
+    this.hud.position.set(this.hudPositionX, this.hudPositionY, this.hudPositionZ);
 
     this.add(this.camera);
   }
+
+  // It creates the marker
+  createMarker(){
+    var text = document.createElement('div');
+    text.id = "marker";
+    text.style.position = 'absolute';
+    text.style.width = 1;
+    text.style.height = 1;
+    text.innerHTML = this.score;
+    text.style.top = 100 + 'px';
+    text.style.left = 100 + 'px';
+    text.style.fontSize = 50 + 'px';
+    document.body.appendChild(text);
+  }
+  
   
   /// It creates lights and adds them to the graph
   createLights () {
@@ -138,52 +140,50 @@ loader.load( 'fonts/Lemon_Milk_Regular.json', function ( font ) {
     this.spotLight.visible = controls.light1onoff;
     this.spotLight.intensity = controls.lightIntensity;
     this.robot.animateRobot(controls.headRotation, controls.bodyRotation, controls.robotExtension);
+    
 
     for(var i = 0; i < this.maxFly; ++i) {
       this.fly[i].update();
     }
 
     this.manageCollitions();
-    this.manageHUD();
 
+    if(this.health <= 0)
+      alert("GAME OVER");
+  }
+
+
+  //It changes the hud's texture
+  changeHUDTexture(image){
+    var loader = new THREE.TextureLoader();
+    var texture = null;
+    this.camera.remove(this.hud);
+    texture  = loader.load (image);
+    this.hud = new HUD(new THREE.MeshBasicMaterial({map: texture }), this.health);
+    this.hud.position.set(this.hudPositionX, this.hudPositionY, this.hudPositionZ);
+    this.camera.add(this.hud);
   }
 
   //Manages the HUD's lifebar
   manageHUD () {
-    if (this.health != this.lastHealth) {
-      var loader = new THREE.TextureLoader();
-      var texture = null;
-      var hudPositionX = (41 / 100) * 2 - 1;
-      var hudPositionY = (55.5 / 100) * 2 - 1;
-      switch(this.health) {
-        case 3:
-          this.camera.remove(this.hud);
-          texture  = loader.load ("imgs/lifebar3.png");
-          this.hud = new HUD(new THREE.MeshBasicMaterial({map: texture }));
-          this.camera.add(this.hud);
-          //Place it in the center
-          this.hud.position.set(hudPositionX, hudPositionY, -0.3);
-        break;
-        case 2:
-          this.camera.remove(this.hud);
-          texture  = loader.load ("imgs/lifebar2.png");
-          this.hud = new HUD(new THREE.MeshBasicMaterial({map: texture }));
-          this.camera.add(this.hud);
-          //Place it in the center
-          this.hud.position.set(hudPositionX, hudPositionY, -0.3);
-        break;
-        case 1:
-          this.camera.remove(this.hud);
-          texture  = loader.load ("imgs/lifebar1.png");
-          this.hud = new HUD(new THREE.MeshBasicMaterial({map: texture }));
-          this.camera.add(this.hud);
-          //Place it in the center
-          this.hud.position.set(hudPositionX, hudPositionY, -0.3);
-        break;
-      }
+
+    if(this.lastHealth < 50 && this.health >= 50){
+      this.changeHUDTexture("imgs/lifebar3.png");
     }
-    this.lastHealth = this.health;
+    else if (this.lastHealth >= 20 && this.health < 20){
+      this.changeHUDTexture("imgs/lifebar1.png");
+    }
+    else if((this.lastHealth < 20 && this.health >=20) || ( this.lastHealth >= 50 && this.health <= 50)){
+      this.changeHUDTexture("imgs/lifebar2.png");
+    }
   }
+
+
+  setScore(){
+    var text = document.getElementById("marker");
+    text.innerHTML = this.score;
+  }
+
 
   // It manages the collitions between the objects and the robot
   manageCollitions () {
@@ -195,8 +195,22 @@ loader.load( 'fonts/Lemon_Milk_Regular.json', function ( font ) {
 
       if (distance <= (paramRobot.radio + paramFly.radio)) {
         this.fly[i].setCollision();
-        if (!paramFly.behaviour && this.health > 1) --this.health;
-        else if (paramFly.behaviour && this.health < 3) ++this.health;
+        this.lastHealth = this.health;
+
+        if (!paramFly.behaviour){
+          this.health -= 10;
+          if (this.health < 0) this.health = 0;
+        } 
+
+        else if (paramFly.behaviour) {
+          var scorePlus = Math.floor(Math.random()*(5+1))
+          this.health += 5 - scorePlus;
+          this.score += scorePlus;
+          this.setScore();
+          if(this.health > 100) this.health = 100;
+        }
+        this.manageHUD();
+        this.hud.changeSize(this.health);
       }
     }
   }

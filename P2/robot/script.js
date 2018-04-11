@@ -160,7 +160,6 @@ function render() {
   stats.update();
   scene.getCameraControls().update ();
   scene.animate(GUIcontrols);
-
   renderer.render(scene, scene.getCamera());
 }
 

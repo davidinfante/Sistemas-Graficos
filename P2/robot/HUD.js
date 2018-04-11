@@ -5,36 +5,42 @@
 
 class HUD extends THREE.Object3D {
 
-  constructor (aMaterial, sizeX, sizeY) {
+  constructor (aMaterial, health) {
     super();
 
-    this.sizeX = (sizeX === undefined ? 0.1 : sizeX);
-    this.sizeY = (sizeY === undefined ? 0.02 : sizeY);
+    this.sizeX = 0.1;
+    this.sizeY = 0.02;
     this.material = aMaterial;
+    this.rectangle = null;
     
-    this.add (this.createRoot());
+    this.add (this.createRoot(health));
   }
   
   // It creates de tree's root
-  createRoot() {
+  createRoot(health) {
     var root = new THREE.Object3D();
     root.castShadow = false;
     root.autoUpdateMatrix = false;
     root.updateMatrix();
-    root.add(this.createLifebar());
+    root.add(this.createLifebar(health));
     return root;
   }
 
   // It creates the life bar
-  createLifebar() {
-    var rectangle = new THREE.Mesh(new THREE.BoxGeometry (this.sizeX, this.sizeY, 0.0), this.material);
+  createLifebar(health) {
+    this.rectangle = new THREE.Mesh(new THREE.BoxGeometry (this.sizeX, this.sizeY, 0.0), this.material);
+    this.rectangle.geometry.applyMatrix (new THREE.Matrix4().makeTranslation (this.sizeX/2, 0, 0));
+    
+    this.rectangle.scale.x = health/100;
+    this.rectangle.castShadow = false;
 
-    rectangle.castShadow = false;
-    rectangle.autoUpdateMatrix = false;
+    return this.rectangle;
+  }
 
-    rectangle.updateMatrix();
+  changeSize(health) {
 
-    return rectangle;
+    this.rectangle.scale.x = health/100;
+    
   }
   
 }
