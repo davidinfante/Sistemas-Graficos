@@ -28,6 +28,9 @@ class TheScene extends THREE.Scene {
     this.lastHealth = 100;
     this.health = 100;
     this.score = 0;
+    this.difficulty = 4; //from 4 to 9
+    this.compareDifficulty = 4;
+    this.compareScore = 10;
 
     this.camera = null;
     this.currentCamera = null;
@@ -43,7 +46,6 @@ class TheScene extends THREE.Scene {
     this.add (this.axis);
     this.model = this.createModel ();
     this.add (this.model);
-
   }
   
   /// It creates the camera and adds it to the graph
@@ -53,7 +55,7 @@ class TheScene extends THREE.Scene {
   createCamera (renderer) {
     this.camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
     this.camera.position.set (0, 200, 200);
-    var look = new THREE.Vector3 (0,20,50);
+    var look = new THREE.Vector3 (0,20,61);
     this.camera.lookAt(look);
 
     this.trackballControls = new THREE.TrackballControls (this.camera, renderer);
@@ -81,7 +83,7 @@ class TheScene extends THREE.Scene {
     text.style.position = 'absolute';
     text.style.width = 1;
     text.style.height = 1;
-    text.innerHTML = this.score;
+    text.innerHTML = "Score: " + this.score;
     text.style.top = 100 + 'px';
     text.style.left = 100 + 'px';
     text.style.fontSize = 50 + 'px';
@@ -117,12 +119,12 @@ class TheScene extends THREE.Scene {
     //It creates the flying objects
     var behaviour = null;
     for (var i = 0; i < this.maxFly; ++i) {
-      if (Math.floor(Math.random() * 10) < 5) {
-        behaviour = true;
-        texture = loader.load ("imgs/cesped.jpg");
-      } else {
+      if (i < this.difficulty) {
         behaviour = false;
         texture = loader.load ("imgs/fuego.jpg");
+      } else {
+        behaviour = true;
+        texture = loader.load ("imgs/cesped.jpg");
       }
       this.fly[i] = new FlyObj(new THREE.MeshPhongMaterial ({map: texture}), behaviour);
       model.add(this.fly[i]);
@@ -191,10 +193,23 @@ class TheScene extends THREE.Scene {
     }
   }
 
-  //It set's the score
-  setScore() {
+  //It set's the score and the difficulty
+  setScore () {
     var text = document.getElementById("marker");
-    text.innerHTML = this.score;
+    text.innerHTML = "Score: " + this.score;
+
+    //It sets the difficulty
+    if (this.difficulty == this.compareDifficulty && this.score >= this.compareScore && this.difficulty < 9) {
+      this.model.remove(this.fly[this.difficulty]);
+      var loader = new THREE.TextureLoader();
+      var texture = loader.load ("imgs/fuego.jpg");
+      this.fly[this.difficulty] = new FlyObj(new THREE.MeshPhongMaterial ({map: texture}), false);
+      this.model.add(this.fly[this.difficulty]);
+
+      this.difficulty++;
+      this.compareDifficulty++;
+      this.compareScore += 10;
+    }
   }
 
 
@@ -229,19 +244,19 @@ class TheScene extends THREE.Scene {
   
   //All the Robot movement funcs
   moveForwRobot () {
-    if (this.robot.position.z > -246) this.robot.position.z -= 2;
+    if (this.robot.root.position.z > -146) this.robot.root.position.z -= 3;
   }
 
   moveBackRobot () {
-    if (this.robot.position.z < 46) this.robot.position.z += 2;
+    if (this.robot.root.position.z < 146) this.robot.root.position.z += 3;
   }
 
   moveLeftRobot () {
-    if (this.robot.position.x > -94) this.robot.position.x -= 2;
+    if (this.robot.root.position.x > -94) this.robot.root.position.x -= 3;
   }
 
   moveRightRobot () {
-    if (this.robot.position.x < 94) this.robot.position.x += 2;
+    if (this.robot.root.position.x < 94) this.robot.root.position.x += 3;
   }
 
   rotateRobot(type) {

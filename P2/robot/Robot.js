@@ -230,9 +230,9 @@ class Robot extends THREE.Object3D {
   //It rotates the robot
   rotateRobot(type) {
     if(type=="L")
-      this.root.rotation.y += 0.2;
+      this.root.rotation.y += 0.3;
     else
-      this.root.rotation.y -= 0.2; 
+      this.root.rotation.y -= 0.3; 
   }
 
   //It moves the robot with a tank type movement
@@ -241,11 +241,11 @@ class Robot extends THREE.Object3D {
     var posZ = this.root.position.z;
 
     if(type=="F") {
-      posZ += 2*Math.cos(this.root.rotation.y);
-      posX += 2*Math.sin(this.root.rotation.y); 
+      posZ += 3*Math.cos(this.root.rotation.y);
+      posX += 3*Math.sin(this.root.rotation.y); 
     } else {
-      posZ -= 2*Math.cos(this.root.rotation.y);
-      posX -= 2*Math.sin(this.root.rotation.y);
+      posZ -= 3*Math.cos(this.root.rotation.y);
+      posX -= 3*Math.sin(this.root.rotation.y);
     }
 
     if (posX > -96 && posX < 96)

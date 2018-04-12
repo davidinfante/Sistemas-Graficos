@@ -46,7 +46,7 @@ class FlyObj extends THREE.Mesh {
 
     setPosition() {
         this.collision = false;
-        this.speed = Math.floor((Math.random() * 100) + 10);
+        this.speed = Math.floor((Math.random() * 100) + 50);
         this.ball.position.z = -150;
         this.ball.position.y = Math.floor((Math.random() * 15) + 5);
         this.ball.position.x = Math.floor((Math.random() * (80 + 80)) - 80);
