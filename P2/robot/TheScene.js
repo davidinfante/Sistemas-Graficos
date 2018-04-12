@@ -10,11 +10,9 @@ class TheScene extends THREE.Scene {
     super();
     
     // Attributes
-    this.hud = null;
     this.marker = null;
     this.ambientLight = null;
     this.spotLight = null;
-    this.camera = null;
     this.trackballControls = null;
     this.robot = null;
     this.ground = null;
@@ -28,6 +26,12 @@ class TheScene extends THREE.Scene {
     this.lastHealth = 100;
     this.health = 100;
     this.score = 0;
+
+    this.camera = null;
+    this.currentCamera = null;
+    this.actualCamera = 0;
+    this.hud = null;
+    this.hudCopy = null;
 
     this.fly = [];
     this.createLights ();
@@ -63,11 +67,13 @@ class TheScene extends THREE.Scene {
     this.camera.add(this.hud);
     this.hud.position.set(this.hudPositionX, this.hudPositionY, this.hudPositionZ);
 
-    this.add(this.camera);
+    this.currentCamera = this.camera;
+
+    this.add(this.currentCamera);
   }
 
   // It creates the marker
-  createMarker(){
+  createMarker() {
     var text = document.createElement('div');
     text.id = "marker";
     text.style.position = 'absolute';
@@ -106,6 +112,7 @@ class TheScene extends THREE.Scene {
     var model = new THREE.Object3D();
     var texture = null;
 
+    //It creates the flying objects
     var behaviour = null;
     for(var i = 0; i < this.maxFly; ++i){
       if (Math.floor(Math.random() * 10) < 5) {
@@ -119,10 +126,12 @@ class TheScene extends THREE.Scene {
       model.add(this.fly[i]);
     }
 
+    //It creates the robot
     texture = loader.load ("imgs/r2d2.png");
     this.robot = new Robot(new THREE.MeshPhongMaterial ({map: texture}));
     model.add (this.robot);
     
+    //It creates the floor
     texture = loader.load ("imgs/cancha.jpg");
     this.ground = new Ground (200, 300, new THREE.MeshPhongMaterial ({map: texture}));
     model.add (this.ground);
@@ -136,6 +145,8 @@ class TheScene extends THREE.Scene {
    * @controls - The GUI information
    */
   animate (controls) {
+    this.hudCopy = this.hud;
+
     this.axis.visible = controls.axis;
     this.spotLight.visible = controls.light1onoff;
     this.spotLight.intensity = controls.lightIntensity;
@@ -154,7 +165,7 @@ class TheScene extends THREE.Scene {
 
 
   //It changes the hud's texture
-  changeHUDTexture(image){
+  changeHUDTexture(image) {
     var loader = new THREE.TextureLoader();
     var texture = null;
     this.camera.remove(this.hud);
@@ -166,20 +177,19 @@ class TheScene extends THREE.Scene {
 
   //Manages the HUD's lifebar
   manageHUD () {
-
-    if(this.lastHealth < 50 && this.health >= 50){
+    if (this.lastHealth < 50 && this.health >= 50) {
       this.changeHUDTexture("imgs/lifebar3.png");
     }
-    else if (this.lastHealth >= 20 && this.health < 20){
+    else if (this.lastHealth >= 20 && this.health < 20) {
       this.changeHUDTexture("imgs/lifebar1.png");
     }
-    else if((this.lastHealth < 20 && this.health >=20) || ( this.lastHealth >= 50 && this.health <= 50)){
+    else if ((this.lastHealth < 20 && this.health >=20) || ( this.lastHealth >= 50 && this.health <= 50)) {
       this.changeHUDTexture("imgs/lifebar2.png");
     }
   }
 
 
-  setScore(){
+  setScore() {
     var text = document.getElementById("marker");
     text.innerHTML = this.score;
   }
@@ -197,12 +207,10 @@ class TheScene extends THREE.Scene {
         this.fly[i].setCollision();
         this.lastHealth = this.health;
 
-        if (!paramFly.behaviour){
+        if (!paramFly.behaviour) {
           this.health -= 10;
           if (this.health < 0) this.health = 0;
-        } 
-
-        else if (paramFly.behaviour) {
+        } else if (paramFly.behaviour) {
           var scorePlus = Math.floor(Math.random()*(5+1))
           this.health += 5 - scorePlus;
           this.score += scorePlus;
@@ -217,19 +225,19 @@ class TheScene extends THREE.Scene {
   
   //All the Robot movement funcs
   moveForwRobot () {
-    this.robot.position.z -= 2;
+    if (this.robot.position.z > -246) this.robot.position.z -= 2;
   }
 
   moveBackRobot () {
-    this.robot.position.z += 2;
+    if (this.robot.position.z < 46) this.robot.position.z += 2;
   }
 
   moveLeftRobot () {
-    this.robot.position.x -= 2;
+    if (this.robot.position.x > -94) this.robot.position.x -= 2;
   }
 
   moveRightRobot () {
-    this.robot.position.x += 2;
+    if (this.robot.position.x < 94) this.robot.position.x += 2;
   }
 
   rotateRobot(type) {
@@ -240,8 +248,21 @@ class TheScene extends THREE.Scene {
     this.robot.moveRobotTank(type);
   }
 
-  changeView(){
-    
+  //It changes the game's view
+  changeView() {
+    if (this.actualCamera == 0) {
+      this.currentCamera.remove(this.hud);
+      this.currentCamera = this.robot.camera;
+      this.currentCamera.add(this.hudCopy);
+
+      this.actualCamera = 1;
+    } else if (this.actualCamera == 1) {
+      this.currentCamera.remove(this.hudCopy);
+      this.currentCamera = this.camera;
+      this.currentCamera.add(this.hud);
+
+      this.actualCamera = 0;
+    }
   }
 
   /// It returns the camera
@@ -249,7 +270,7 @@ class TheScene extends THREE.Scene {
    * @return The camera
    */
   getCamera () {
-    return this.camera;
+    return this.currentCamera;
   }
   
   /// It returns the camera controls

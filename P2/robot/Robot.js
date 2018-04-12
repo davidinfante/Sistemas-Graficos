@@ -17,9 +17,10 @@ class Robot extends THREE.Object3D {
     this.head = null;
     this.body = null;
     this.extension = null;
-    this.hitbox = null;
 
-    //Provisional
+    this.hitbox = null;
+    this.camera = null;
+
     this.footHeight = 2;
     this.footWidth = 2;
 
@@ -149,11 +150,13 @@ class Robot extends THREE.Object3D {
     eye.rotation.x = 1.5708;
     eye.castShadow = true;
     eye.add(this.createLight());
+    eye.add(this.createCamera());
 
     this.head.add(eye);
     return this.head;
   }
 
+  //It creates the robot's lantern in its eye
   createLight() {
     var robotLight = new THREE.SpotLight( 0xffffff );
     robotLight.position.set(0, this.bodyWidth/4, this.bodyWidth/2.5);
@@ -169,6 +172,16 @@ class Robot extends THREE.Object3D {
     robotLight.add(targetLight);
 
     return robotLight;
+  }
+
+  //It creates the robot's camera in its eye
+  createCamera() {
+    this.camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
+    this.camera.position.set(0, this.bodyWidth/4, this.bodyWidth/2.5);
+    var look = new THREE.Vector3 (0,200,50);
+    this.camera.lookAt(look);
+
+    return this.camera;
   }
 
   //It creates the shoulders and the mini legs
@@ -227,8 +240,7 @@ class Robot extends THREE.Object3D {
     if(type=="F") {
       this.root.position.z += 2*Math.cos(this.root.rotation.y);
       this.root.position.x += 2*Math.sin(this.root.rotation.y); 
-    }
-    else {
+    } else {
       this.root.position.z -= 2*Math.cos(this.root.rotation.y);
       this.root.position.x -= 2*Math.sin(this.root.rotation.y);
     }

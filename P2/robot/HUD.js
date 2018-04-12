@@ -38,9 +38,7 @@ class HUD extends THREE.Object3D {
   }
 
   changeSize(health) {
-
     this.rectangle.scale.x = health/100;
-    
   }
   
 }
