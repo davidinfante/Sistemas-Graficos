@@ -31,3 +31,10 @@ Para usar la práctica desde otro sistema operativo, buscar la manera de crear u
 - Hacer que la base de la grúa sea cuadrada en vez de circular. `Box base`
 - Hacer que la cuerda de la grúa sea más estrecha. `Thinner string`
 - Añadir un botón que permita eliminar cajas de la escena al hacer clic sobre ellas. Se sale de ese modo haciendo clic con el botón derecho. `Deleting Boxes`
+
+# P2 - Práctica 2 - Robot
+
+A simple game of a Robot that has to pick up items to gain health and obtain points. The green ones will heal and give you points. Red ones will decrease your health.
+
+- You can move with tank controls using the arrow keys or with a normal movement using wasd.
+- To change the perspective to first person press 'v' and press it again to change it back.
