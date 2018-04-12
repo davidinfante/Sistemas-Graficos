@@ -1,3 +1,7 @@
+/**
+ * @author David Infante, Jose Ariza
+ * 
+ */
 
 /// Several functions, including the main
 
@@ -34,7 +38,7 @@ function createGUI (withStats) {
     axisLights.add(GUIcontrols, 'light1onoff').name('Light1 on/off :');
     axisLights.add(GUIcontrols, 'lightIntensity', 0, 1.0).name('Light1 intensity :');
 
-  var robotMovements = gui.addFolder ('Robor movements');
+  var robotMovements = gui.addFolder ('Robot movements');
     robotMovements.add(GUIcontrols, 'headRotation', -1.39, 1.39).name ('Rotate Head'); 
     robotMovements.add(GUIcontrols, 'bodyRotation', -0.52, 0.78).name ('Rotate Body'); 
     robotMovements.add(GUIcontrols, 'robotExtension', 0, 2).name ('Extend Robot');

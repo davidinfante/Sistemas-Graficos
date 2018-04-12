@@ -237,13 +237,21 @@ class Robot extends THREE.Object3D {
 
   //It moves the robot with a tank type movement
   moveRobotTank(type) {
+    var posX = this.root.position.x;
+    var posZ = this.root.position.z;
+
     if(type=="F") {
-      this.root.position.z += 2*Math.cos(this.root.rotation.y);
-      this.root.position.x += 2*Math.sin(this.root.rotation.y); 
+      posZ += 2*Math.cos(this.root.rotation.y);
+      posX += 2*Math.sin(this.root.rotation.y); 
     } else {
-      this.root.position.z -= 2*Math.cos(this.root.rotation.y);
-      this.root.position.x -= 2*Math.sin(this.root.rotation.y);
+      posZ -= 2*Math.cos(this.root.rotation.y);
+      posX -= 2*Math.sin(this.root.rotation.y);
     }
+
+    if (posX > -96 && posX < 96)
+      this.root.position.x = posX;
+    if (posZ > -146 && posZ < 146)
+      this.root.position.z = posZ;
   }
 
   

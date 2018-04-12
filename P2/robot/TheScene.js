@@ -1,6 +1,8 @@
 
 /// The Model Facade class. The root node of the graph.
 /**
+ * @author David Infante, Jose Ariza
+ *
  * @param renderer - The renderer to visualize the scene
  */
  
@@ -31,7 +33,7 @@ class TheScene extends THREE.Scene {
     this.currentCamera = null;
     this.actualCamera = 0;
     this.hud = null;
-    this.hudCopy = null;
+    this.hudRobot = null;
 
     this.fly = [];
     this.createLights ();
@@ -61,11 +63,11 @@ class TheScene extends THREE.Scene {
     this.trackballControls.target = look;
     
     //HUD creation
-    var loader = new THREE.TextureLoader();
-    var texture  = loader.load ("imgs/lifebar3.png");
-    this.hud = new HUD(new THREE.MeshBasicMaterial({map: texture }), this.health);
+    this.hud = new HUD(new THREE.LineBasicMaterial({ color: 0x00ff00 }), this.health);
+    this.hudRobot = new HUD(new THREE.LineBasicMaterial({ color: 0x00ff00 }), this.health);
     this.camera.add(this.hud);
     this.hud.position.set(this.hudPositionX, this.hudPositionY, this.hudPositionZ);
+    this.hudRobot.position.set(this.hudPositionX, this.hudPositionY, this.hudPositionZ);
 
     this.currentCamera = this.camera;
 
@@ -108,19 +110,19 @@ class TheScene extends THREE.Scene {
    * @return The model
    */
   createModel () {
-    var loader = new THREE.TextureLoader();
     var model = new THREE.Object3D();
+    var loader = new THREE.TextureLoader();
     var texture = null;
 
     //It creates the flying objects
     var behaviour = null;
-    for(var i = 0; i < this.maxFly; ++i){
+    for (var i = 0; i < this.maxFly; ++i) {
       if (Math.floor(Math.random() * 10) < 5) {
         behaviour = true;
-        texture = loader.load ("imgs/cabesaxD.jpg");
+        texture = loader.load ("imgs/cesped.jpg");
       } else {
         behaviour = false;
-        texture = loader.load ("imgs/puma.jpg");
+        texture = loader.load ("imgs/fuego.jpg");
       }
       this.fly[i] = new FlyObj(new THREE.MeshPhongMaterial ({map: texture}), behaviour);
       model.add(this.fly[i]);
@@ -132,7 +134,7 @@ class TheScene extends THREE.Scene {
     model.add (this.robot);
     
     //It creates the floor
-    texture = loader.load ("imgs/cancha.jpg");
+    texture = loader.load ("imgs/carretera.jpg");
     this.ground = new Ground (200, 300, new THREE.MeshPhongMaterial ({map: texture}));
     model.add (this.ground);
 
@@ -145,50 +147,51 @@ class TheScene extends THREE.Scene {
    * @controls - The GUI information
    */
   animate (controls) {
-    this.hudCopy = this.hud;
-
     this.axis.visible = controls.axis;
     this.spotLight.visible = controls.light1onoff;
     this.spotLight.intensity = controls.lightIntensity;
     this.robot.animateRobot(controls.headRotation, controls.bodyRotation, controls.robotExtension);
     
 
-    for(var i = 0; i < this.maxFly; ++i) {
+    for (var i = 0; i < this.maxFly; ++i) {
       this.fly[i].update();
     }
 
     this.manageCollitions();
 
-    if(this.health <= 0)
+    if (this.health <= 0)
       alert("GAME OVER");
   }
 
 
   //It changes the hud's texture
   changeHUDTexture(image) {
-    var loader = new THREE.TextureLoader();
-    var texture = null;
-    this.camera.remove(this.hud);
-    texture  = loader.load (image);
-    this.hud = new HUD(new THREE.MeshBasicMaterial({map: texture }), this.health);
+    this.currentCamera.remove(this.hud);
+    this.currentCamera.remove(this.hudRobot);
+
+    this.hud = new HUD(new THREE.LineBasicMaterial({ color: image }), this.health);
+    this.hudRobot = new HUD(new THREE.LineBasicMaterial({ color: image }), this.health);
     this.hud.position.set(this.hudPositionX, this.hudPositionY, this.hudPositionZ);
-    this.camera.add(this.hud);
+    this.hudRobot.position.set(this.hudPositionX, this.hudPositionY, this.hudPositionZ);
+
+    if (this.actualCamera == 1) this.currentCamera.add(this.hud);
+    if (this.actualCamera == 0) this.currentCamera.add(this.hudRobot);
   }
 
   //Manages the HUD's lifebar
   manageHUD () {
     if (this.lastHealth < 50 && this.health >= 50) {
-      this.changeHUDTexture("imgs/lifebar3.png");
+      this.changeHUDTexture(0x00ff00);
     }
     else if (this.lastHealth >= 20 && this.health < 20) {
-      this.changeHUDTexture("imgs/lifebar1.png");
+      this.changeHUDTexture(0xff0000);
     }
     else if ((this.lastHealth < 20 && this.health >=20) || ( this.lastHealth >= 50 && this.health <= 50)) {
-      this.changeHUDTexture("imgs/lifebar2.png");
+      this.changeHUDTexture(0xffa500);
     }
   }
 
-
+  //It set's the score
   setScore() {
     var text = document.getElementById("marker");
     text.innerHTML = this.score;
@@ -198,7 +201,7 @@ class TheScene extends THREE.Scene {
   // It manages the collitions between the objects and the robot
   manageCollitions () {
     var paramRobot = this.robot.getParameters();
-    for(var i = 0; i < this.maxFly; ++i) {
+    for (var i = 0; i < this.maxFly; ++i) {
       var paramFly = this.fly[i].getParameters();
       var distance = Math.sqrt(Math.pow((paramFly.x - paramRobot.pos.x),2) + Math.pow((paramFly.y - paramRobot.pos.y),2)
         + Math.pow((paramFly.z - paramRobot.pos.z),2));
@@ -219,6 +222,7 @@ class TheScene extends THREE.Scene {
         }
         this.manageHUD();
         this.hud.changeSize(this.health);
+        this.hudRobot.changeSize(this.health);
       }
     }
   }
@@ -253,11 +257,11 @@ class TheScene extends THREE.Scene {
     if (this.actualCamera == 0) {
       this.currentCamera.remove(this.hud);
       this.currentCamera = this.robot.camera;
-      this.currentCamera.add(this.hudCopy);
+      this.currentCamera.add(this.hudRobot);
 
       this.actualCamera = 1;
     } else if (this.actualCamera == 1) {
-      this.currentCamera.remove(this.hudCopy);
+      this.currentCamera.remove(this.hudRobot);
       this.currentCamera = this.camera;
       this.currentCamera.add(this.hud);
 

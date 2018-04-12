@@ -23,6 +23,7 @@ class HUD extends THREE.Object3D {
     root.autoUpdateMatrix = false;
     root.updateMatrix();
     root.add(this.createLifebar(health));
+    root.add(this.createContainer());
     return root;
   }
 
@@ -35,6 +36,16 @@ class HUD extends THREE.Object3D {
     this.rectangle.castShadow = false;
 
     return this.rectangle;
+  }
+
+  // It creates the container
+  createContainer() {
+    var container = new THREE.Mesh(new THREE.BoxGeometry (this.sizeX*1.025, this.sizeY*1.1, 0.0), new THREE.LineBasicMaterial({ color: 0x000000 }));
+    container.geometry.applyMatrix (new THREE.Matrix4().makeTranslation (this.sizeX/2., 0, -0.0001));
+    
+    container.castShadow = false;
+
+    return container;
   }
 
   changeSize(health) {
