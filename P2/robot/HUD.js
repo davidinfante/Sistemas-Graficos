@@ -40,7 +40,7 @@ class HUD extends THREE.Object3D {
 
   // It creates the container
   createContainer() {
-    var container = new THREE.Mesh(new THREE.BoxGeometry (this.sizeX*1.025, this.sizeY*1.1, 0.0), new THREE.LineBasicMaterial({ color: 0x000000 }));
+    var container = new THREE.Mesh(new THREE.BoxGeometry (this.sizeX*1.025, this.sizeY*1.1, 0.0), new THREE.LineBasicMaterial({ color: 0xffffff }));
     container.geometry.applyMatrix (new THREE.Matrix4().makeTranslation (this.sizeX/2., 0, -0.0001));
     
     container.castShadow = false;

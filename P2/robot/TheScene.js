@@ -46,6 +46,8 @@ class TheScene extends THREE.Scene {
     this.add (this.axis);
     this.model = this.createModel ();
     this.add (this.model);
+
+    this.background = new THREE.Color( 0x000000 );
   }
   
   /// It creates the camera and adds it to the graph
@@ -87,6 +89,7 @@ class TheScene extends THREE.Scene {
     text.style.top = 100 + 'px';
     text.style.left = 100 + 'px';
     text.style.fontSize = 50 + 'px';
+    text.style.color = "white";
     document.body.appendChild(text);
   }
   
